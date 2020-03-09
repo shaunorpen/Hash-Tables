@@ -40,7 +40,7 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         within the storage capacity of the hash table.
         '''
-        return self._hash(key) % self.capacity
+        return abs(self._hash(key)) % self.capacity
 
 
     def insert(self, key, value):
@@ -52,8 +52,8 @@ class HashTable:
         Fill this in.
         '''
 
-        index = abs(self._hash(key)) % self.capacity
-        
+        index = self._hash_mod(key)
+
         if self.storage[index] == None:
             self.storage[index] = LinkedPair(key, value)
         else:
@@ -77,7 +77,25 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+
+        index = self._hash_mod(key)
+
+        curVal = self.storage[index]
+        nextVal = curVal.next
+
+        if nextVal is None:
+            self.storage[index] = None
+        else:
+            if curVal.key == key:
+                self.storage[index] = nextVal
+            else:
+                while nextVal:
+                    if nextVal.key == key:
+                        curVal.next = nextVal.next
+                        return
+                    else:
+                        curVal = nextVal
+                        nextVal = curVal.next
 
 
     def retrieve(self, key):
@@ -89,11 +107,13 @@ class HashTable:
         Fill this in.
         '''
         # Calculate the index related to the key
-        index = abs(self._hash(key)) % self.capacity
+        index = self._hash_mod(key)
         # Find the value(s) at this index
         value = self.storage[index]
         # Search through each value to find the one that matches the key,
         # then return it 
+        if value is None:
+            return None
         while value.next or value.value:
             if value.key == key:
                 return value.value
