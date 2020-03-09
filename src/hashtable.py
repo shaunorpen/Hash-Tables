@@ -125,10 +125,21 @@ class HashTable:
 
         Fill this in.
         '''
-        newStorage = [None] * 2 * self.capacity
+        newCapacity = 2 * self.capacity
+        newStorage = [None] * newCapacity
+        oldStorage = self.storage
 
-        for i in range(self.capacity):
-            newStorage[i] = self.storage[i]
+        self.capacity = newCapacity
+        self.storage = newStorage
+
+        for i in oldStorage:
+            if i is None:
+                continue
+            else:
+                self.insert(i.key, i.value)
+                while i.next is not None:
+                    i = i.next
+                    self.insert(i.key, i.value)
 
         self.storage = newStorage
 
