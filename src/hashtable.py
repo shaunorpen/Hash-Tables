@@ -106,12 +106,10 @@ class HashTable:
 
         Fill this in.
         '''
-        # Calculate the index related to the key
         index = self._hash_mod(key)
-        # Find the value(s) at this index
+
         value = self.storage[index]
-        # Search through each value to find the one that matches the key,
-        # then return it 
+
         if value is None:
             return None
         while value.next or value.value:
