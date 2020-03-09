@@ -52,20 +52,22 @@ class HashTable:
         Fill this in.
         '''
 
-        # Create a new linked pair using the key and value
-        linkedPair = LinkedPair(key, value)
-        # Calculate the index related to the key
         index = abs(self._hash(key)) % self.capacity
-        # Update storage at index hash to be the linked pair
-        # If there's already a value at that index, chain the new
-        # value to the existing value 
+        
         if self.storage[index] == None:
-            self.storage[index] = linkedPair
+            self.storage[index] = LinkedPair(key, value)
         else:
-            value = self.storage[index]
-            while value.next:
-                value = value.next
-            value.next = linkedPair            
+            curVal = self.storage[index]
+            while curVal:
+                if curVal.key == key:
+                    curVal.value = value
+                    return
+                else:
+                    if curVal.next:
+                        curVal = curVal.next
+                    else:
+                        curVal.next = LinkedPair(key, value)
+                        return
 
     def remove(self, key):
         '''
