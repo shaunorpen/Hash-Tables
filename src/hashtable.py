@@ -51,9 +51,21 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
 
-
+        # Create a new linked pair using the key and value
+        linkedPair = LinkedPair(key, value)
+        # Calculate the index related to the key
+        index = abs(self._hash(key)) % self.capacity
+        # Update storage at index hash to be the linked pair
+        # If there's already a value at that index, chain the new
+        # value to the existing value 
+        if self.storage[index] == None:
+            self.storage[index] = linkedPair
+        else:
+            value = self.storage[index]
+            while value.next:
+                value = value.next
+            value.next = linkedPair            
 
     def remove(self, key):
         '''
@@ -74,8 +86,17 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
+        # Calculate the index related to the key
+        index = abs(self._hash(key)) % self.capacity
+        # Find the value(s) at this index
+        value = self.storage[index]
+        # Search through each value to find the one that matches the key,
+        # then return it 
+        while value.next or value.value:
+            if value.key == key:
+                return value.value
+            else:
+                value = value.next
 
     def resize(self):
         '''
