@@ -125,7 +125,12 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        newStorage = [None] * 2 * self.capacity
+
+        for i in range(self.capacity):
+            newStorage[i] = self.storage[i]
+
+        self.storage = newStorage
 
 
 
