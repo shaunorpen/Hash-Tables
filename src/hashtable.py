@@ -43,6 +43,10 @@ class HashTable:
         '''
         return abs(self._hash(key)) % self.capacity
 
+    def _resize_required(self):
+        loadFactor = self.usedCapacity / self.capacity
+        if self.resized == True and (loadFactor >= 0.7 or loadFactor <= 0.2):
+            self.resize(loadFactor)
 
     def insert(self, key, value):
         '''
@@ -72,8 +76,7 @@ class HashTable:
         
         self.usedCapacity += 1
 
-        if self.usedCapacity / self.capacity >= 0.7 and self.resized == True:
-            self.resize()
+        self._resize_required()
 
     def remove(self, key):
         '''
@@ -105,8 +108,7 @@ class HashTable:
 
         self.usedCapacity -= 1
 
-        if self.usedCapacity / self.capacity <= 0.2 and self.resized == True:
-            self.resize()
+        self._resize_required()
 
 
     def retrieve(self, key):
@@ -129,14 +131,14 @@ class HashTable:
             else:
                 value = value.next
 
-    def resize(self):
+    def resize(self, loadFactor = 1):
         '''
         Doubles the capacity of the hash table and
         rehash all key/value pairs.
 
         Fill this in.
         '''
-        newCapacity = 2 * self.capacity if self.usedCapacity / self.capacity >= 0.7 else int(0.5 * self.capacity)
+        newCapacity = 2 * self.capacity if loadFactor >= 0.7 else int(0.5 * self.capacity)
         newStorage = [None] * newCapacity
         oldStorage = self.storage
 
