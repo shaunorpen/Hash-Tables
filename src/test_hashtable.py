@@ -192,6 +192,18 @@ class TestHashTable(unittest.TestCase):
         return_value = ht.retrieve("key-9")
         self.assertTrue(return_value == "val-9")
 
+        ht.insert("key-10", "val-10")
+        ht.insert("key-11", "val-11")
+        ht.insert("key-12", "val-12")
+        ht.insert("key-13", "val-13")
+        ht.insert("key-14", "val-14")
+        ht.insert("key-15", "val-15")
+        ht.insert("key-16", "val-16")
+        ht.insert("key-17", "val-17")
+        ht.insert("key-18", "val-18")
+        ht.insert("key-19", "val-19")
+
+        self.assertTrue(len(ht.storage) == 64)
 
 if __name__ == '__main__':
     unittest.main()

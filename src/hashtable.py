@@ -15,7 +15,8 @@ class HashTable:
     def __init__(self, capacity):
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
-
+        self.resized = False
+        self.usedCapacity = 0
 
     def _hash(self, key):
         '''
@@ -32,7 +33,14 @@ class HashTable:
 
         OPTIONAL STRETCH: Research and implement DJB2
         '''
-        pass
+        hash = 5381
+
+        for char in key:
+            hash = ((hash << 5) + hash) + ord(char)
+
+        result = hash & 0xFFFFFFFF
+
+        return result
 
 
     def _hash_mod(self, key):
@@ -40,8 +48,12 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         within the storage capacity of the hash table.
         '''
-        return self._hash(key) % self.capacity
+        return abs(self._hash_djb2(key)) % self.capacity
 
+    def _resize_required(self):
+        loadFactor = self.usedCapacity / self.capacity
+        if self.resized == True and (loadFactor >= 0.7 or loadFactor <= 0.2):
+            self.resize(loadFactor)
 
     def insert(self, key, value):
         '''
@@ -51,9 +63,27 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
 
+        index = self._hash_mod(key)
 
+        if self.storage[index] == None:
+            self.storage[index] = LinkedPair(key, value)
+        else:
+            curVal = self.storage[index]
+            while curVal:
+                if curVal.key == key:
+                    curVal.value = value
+                    return
+                else:
+                    if curVal.next:
+                        curVal = curVal.next
+                    else:
+                        curVal.next = LinkedPair(key, value)
+                        return
+        
+        self.usedCapacity += 1
+
+        self._resize_required()
 
     def remove(self, key):
         '''
@@ -63,7 +93,29 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+
+        index = self._hash_mod(key)
+
+        curVal = self.storage[index]
+        nextVal = curVal.next
+
+        if nextVal is None:
+            self.storage[index] = None
+        else:
+            if curVal.key == key:
+                self.storage[index] = nextVal
+            else:
+                while nextVal:
+                    if nextVal.key == key:
+                        curVal.next = nextVal.next
+                        return
+                    else:
+                        curVal = nextVal
+                        nextVal = curVal.next
+
+        self.usedCapacity -= 1
+
+        self._resize_required()
 
 
     def retrieve(self, key):
@@ -74,17 +126,42 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
 
+        value = self.storage[index]
 
-    def resize(self):
+        if value is None:
+            return None
+        while value.next or value.value:
+            if value.key == key:
+                return value.value
+            else:
+                value = value.next
+
+    def resize(self, loadFactor = 1):
         '''
         Doubles the capacity of the hash table and
         rehash all key/value pairs.
 
         Fill this in.
         '''
-        pass
+        newCapacity = 2 * self.capacity if loadFactor >= 0.7 else int(0.5 * self.capacity)
+        newStorage = [None] * newCapacity
+        oldStorage = self.storage
+
+        self.capacity = newCapacity
+        self.storage = newStorage
+
+        for i in oldStorage:
+            if i is None:
+                continue
+            else:
+                self.insert(i.key, i.value)
+                while i.next is not None:
+                    i = i.next
+                    self.insert(i.key, i.value)
+
+        self.resized = True
 
 
 
